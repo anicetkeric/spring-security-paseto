@@ -27,8 +27,7 @@ public class AuthTokenFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(@NonNull HttpServletRequest request, @NonNull HttpServletResponse response, @NonNull FilterChain filterChain) throws ServletException, IOException {
 
-
-        Optional<String> jwt = resolveToken(request);
+        Optional<String> jwt = resolveHeaderToken(request);
         if (jwt.isPresent() && tokenProvider.validateToken(jwt.get())) {
 
             String username = tokenProvider.extractUsername(jwt.get());
@@ -42,7 +41,7 @@ public class AuthTokenFilter extends OncePerRequestFilter {
         filterChain.doFilter(request, response);
     }
 
-    public static Optional<String> resolveToken(HttpServletRequest request) {
+    private Optional<String> resolveHeaderToken(HttpServletRequest request) {
         String bearerToken = request.getHeader("Authorization");
         return StringUtils.isNotEmpty(bearerToken) && bearerToken.startsWith("Bearer ") ? Optional.of(bearerToken.substring(7)) : Optional.empty();
     }

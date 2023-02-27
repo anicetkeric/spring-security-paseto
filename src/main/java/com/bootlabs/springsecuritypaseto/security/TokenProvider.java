@@ -29,7 +29,6 @@ public class TokenProvider {
         keyPair = Keys.keyPairFor(Version.V2);
     }
 
-
     /**
      * Extract username from token string.
      *
@@ -78,15 +77,12 @@ public class TokenProvider {
 
         User userPrincipal = (User) authentication.getPrincipal();
 
-        var kid = UUID.randomUUID().toString();
-        log.info(kid);
-        log.info(now.toString());
         return Pasetos.V2.LOCAL.builder()
                 .setSharedSecret(secretKey)
                 .setIssuedAt(now)
                 .setExpiration(now.plus(2, ChronoUnit.HOURS))
                 .setSubject(userPrincipal.getUsername())
-                .setKeyId(kid)
+                .setKeyId(UUID.randomUUID().toString())
                 .setAudience("bootlabs.com")
                 .setIssuer("dev.com")
                 .claim("aut", authorities)
@@ -104,11 +100,8 @@ public class TokenProvider {
                 .setSharedSecret(secretKey)
                 .setPublicKey(keyPair.getPublic())
                 .build();
-        var result = parser.parse(token);
-        result.getClaims().forEach((key, value) -> log.info("    " + key + ": " + value));
-        return result;
-       // return parser.parse(token);
 
+       return parser.parse(token);
     }
 
     /**
@@ -121,7 +114,7 @@ public class TokenProvider {
         try {
             parseToken(authToken);
             return !isTokenExpired(authToken);
-        } catch (Exception e) {
+        } catch (PasetoException e) {
             log.error("Token validation error: {}", e.getMessage());
             return false;
         }

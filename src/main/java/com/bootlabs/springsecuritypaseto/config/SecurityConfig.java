@@ -29,17 +29,17 @@ public class SecurityConfig {
     private final UserDetailsService userDetailsService;
     private final AuthTokenFilter authTokenFilter;
 
-    @Bean
+    @Bean // (1)
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
 
-    @Bean
+    @Bean // (2)
     public AuthenticationManager authenticationManager(AuthenticationConfiguration authConfig) throws Exception {
         return authConfig.getAuthenticationManager();
     }
 
-    @Bean
+    @Bean // (3)
     public AuthenticationProvider authenticationProvider() {
         DaoAuthenticationProvider daoAuthenticationProvider = new DaoAuthenticationProvider();
         daoAuthenticationProvider.setUserDetailsService(userDetailsService);
@@ -47,7 +47,7 @@ public class SecurityConfig {
         return daoAuthenticationProvider;
     }
 
-    @Bean
+    @Bean // (4)
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         // @formatter:off
         http

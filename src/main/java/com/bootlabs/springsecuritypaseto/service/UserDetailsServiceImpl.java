@@ -30,47 +30,54 @@ public class UserDetailsServiceImpl implements UserService {
     @Override
     public UserDetails loadUserByUsername(String usernameValue) {
         Optional<User> user = getUserByUsername(usernameValue);
-        if(user.isPresent()) {
-            detailsChecker.check(user.get());
-            return user.get();
-        } else {
+        if (user.isEmpty()) {
             throw new UsernameNotFoundException("Invalid username or password.");
         }
+
+        detailsChecker.check(user.get());
+        return user.get();
     }
 
-    @Override
-    public Optional<User> getUserByUsername(String usernameValue) {
+
+    /**
+     * @param usernameValue username or email
+     * @return Optional User
+     */
+    private Optional<User> getUserByUsername(String usernameValue) {
         // trim username value
         var username = StringUtils.trimToNull(usernameValue);
-        if(StringUtils.isNotEmpty(username)) {
-            return username.contains("@") ? userRepository.findActiveByEmail(username) : userRepository.findActiveByUsername(username);
-        }else {
+        if (StringUtils.isEmpty(username)) {
             return Optional.empty();
         }
+        return username.contains("@") ? userRepository.findActiveByEmail(username) : userRepository.findActiveByUsername(username);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public List<User> getUsers() {
         return userRepository.findAll();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public User save(User user) {
-        if(userRepository.findByUsername(user.getUsername()).isPresent()){
+        if (userRepository.findByUsername(user.getUsername()).isPresent()) {
             throw new DuplicateException("Username Already exist !!");
         }
-        if(userRepository.findByEmail(user.getEmail()).isPresent()){
+        if (userRepository.findByEmail(user.getEmail()).isPresent()) {
             throw new DuplicateException("Email Already exist !!");
         }
 
         return userRepository.save(user);
     }
 
-    @Override
-    public String authenticate(String username, String password) {
-        return null;
-    }
-
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public UserDetails updatePassword(UserDetails user, String newPassword) {
         return null;

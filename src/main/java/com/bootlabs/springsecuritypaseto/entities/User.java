@@ -67,7 +67,7 @@ public class User implements UserDetails {
     private boolean accountNonLocked;
 
     /*
-     * Get all roles associated with the User that are not deleted
+     * Get all roles associated with the User
      */
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(name = "role_user", joinColumns = {
